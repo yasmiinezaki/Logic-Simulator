@@ -4,7 +4,7 @@
 #include "Delete.h"
 #include "Label.h"
 
-
+//yasmeen
 ApplicationManager::ApplicationManager()
 {
 	CompCount = 0;
