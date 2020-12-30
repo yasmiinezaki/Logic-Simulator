@@ -2,7 +2,7 @@
 #include "Actions/Action.h"
 #include "ApplicationManager.h"
 
-
+//yasmeen
 Delete::Delete(ApplicationManager* pMang) : Action(pMang)
 {
 	Index = -1;
