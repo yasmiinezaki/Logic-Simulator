@@ -1,5 +1,6 @@
 #include "ApplicationManager.h"
 #include "Actions\AddANDgate2.h"
+
 #include "Actions/AddOrGate2.h"
 #include "Actions/AddNandGate2.h"
 #include "Actions/AddNorGate2.h"
@@ -32,16 +33,16 @@
 #include "Actions/Probing.h"
 #include <fstream>
 
+
 ApplicationManager::ApplicationManager()
 {
 	UniqueId = 1;
 	CopiedComp = NoComp;
 	UniqueId = 1;
 	GatesCount = 0;
-
 	SelectedComp = NULL;
 	SelectedIndex = -1;
-	/////////////////////////////
+
 	CompCount = 0;
 
 	for(int i=0; i<MaxCompCount; i++)
@@ -50,6 +51,9 @@ ApplicationManager::ApplicationManager()
 	//Creates the Input / Output Objects & Initialize the GUI
 	OutputInterface = new Output();
 	InputInterface = OutputInterface->CreateInput();
+	SelectedComp = NULL;
+	SelectedIndex = -1;
+
 }
 ////////////////////////////////////////////////////////////////////
 void ApplicationManager::AddComponent(Component* pComp)
@@ -74,6 +78,7 @@ void ApplicationManager::ExecuteAction(ActionType ActType)
 	Action* pAct = NULL;
 	switch (ActType)
 	{
+
 		case ADD_COMPONENT:
 			pAct = new ADD_COMP(this);
 			break;
@@ -207,9 +212,9 @@ void ApplicationManager::ExecuteAction(ActionType ActType)
 void ApplicationManager::UpdateInterface()
 {
 	OutputInterface->ClearDrawingArea();
+
 	for(int i=0; i<CompCount; i++)
 		CompList[i]->Draw(OutputInterface);
-
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -226,6 +231,76 @@ Output* ApplicationManager::GetOutput()
 
 ////////////////////////////////////////////////////////////////////
 
+bool ApplicationManager::CheckCircuitValidation(int& InputPins, int& OutputPinsConn)
+{
+	InputPins = 0;              //count the sum of all input pins 
+	OutputPinsConn = 0;         //count the sum of all output pins connections
+	int SwitchNum = 0;
+	int LedNum = 0;
+	int CurrOutPinConn;
+	if (CompCount == 0)
+	{
+		return true;
+	}
+	else
+	{
+		for (int i = 0; i < CompCount; i++)
+		{
+			if ((CompList[i]->GetCompType() == Comp_LED))
+			{
+				LedNum++;
+			}
+			if ((CompList[i]->GetCompType() == Comp_SWITCH))
+			{
+				SwitchNum++;
+			}
+			if (CompList[i]->GetCompType() != Comp_WIRE)
+			{
+				Gate* CurrentGate;
+				CurrentGate = (Gate*)CompList[i];  //casting component to gate pointer
+				CurrOutPinConn = CurrentGate->Getm_Conn();  //get the number of connection in the output of the current gate
+				if (CurrOutPinConn == 0) // check if it is zero
+				{
+					return true;  //it mean that the current component has zero connections to the its output pin
+				}
+				else
+				{
+					if (CompList[i]->GetCompType() != Comp_LED)
+					{
+						OutputPinsConn += CurrOutPinConn; //Add the current m_conn to the sum
+					}
+					InputPins += CurrentGate->GetInputPinsNum(); //add the current input to the sum
+				}
+			}
+		}
+	}
+	if ((LedNum == 0) || (SwitchNum == 0))
+	{
+		return true;
+	}
+	 return false; //it means that all gates has at least 1 connection to their output pin
+}
+
+/////////////////////////////////////////////////////////////////////
+
+void ApplicationManager::SimulateCircuitOutput()
+{
+	bool repeat = true;
+	while (repeat)
+	{
+		repeat = false;
+		for (int i = 0;i < CompCount;i++)
+		{
+			CompList[i]->Operate();  //call operate function 
+			if (CompList[i]->NotAssignedInput()) //check if input pin of any gate assigned or not
+			{
+				repeat = true;
+			}
+		}
+	}
+}
+
+
 ApplicationManager::~ApplicationManager()
 {
 	for(int i=0; i<CompCount; i++)
@@ -234,9 +309,8 @@ ApplicationManager::~ApplicationManager()
 	delete InputInterface;
 	
 }
-
 //////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////// 
+
 void ApplicationManager::RemoveComp(int Count)
 {
 	if (CompList[Count]->GetCompType() != Comp_WIRE)
@@ -245,7 +319,8 @@ void ApplicationManager::RemoveComp(int Count)
 	}
 	delete CompList[Count]; //delete the dynamically allocated component
 	CompList[Count] = NULL;
-	for (int i = Count; i < CompCount; i++)
+
+	for (int i = Count; i < CompCount - 1; i++)
 	{
 		CompList[i] = CompList[i + 1];
 	}
@@ -263,6 +338,7 @@ void ApplicationManager::RemoveAll()
 	CompCount = 0;
 	GatesCount = 0;
 }
+
 
 Component* ApplicationManager::FindComp(int Cx, int Cy, int& Index, CompType& Type)
 {
@@ -286,6 +362,7 @@ Component* ApplicationManager::GetComp(int i)
 {
 	return CompList[i];
 }
+
 
 Component* ApplicationManager::GetComp_Id(int Id)
 {
@@ -342,7 +419,9 @@ void ApplicationManager::LoadAll(ifstream& LoadFile)
 	//loop on the file to read each line till it reaches the header "Connection" 
 	for (int i = 0; i < GatesCount; i++)
 	{
+
 		LoadFile >> GateType ; //reads gate type
+
 		if (GateType == "AND2")
 		{
 			AND2* pComp = new AND2(AND2_FANOUT);
@@ -355,6 +434,7 @@ void ApplicationManager::LoadAll(ifstream& LoadFile)
 			pComp->LoadComp(LoadFile);
 			AddComponent(pComp);
 		}
+
 		else if(GateType == "NAND2")
 		{
 			NAND* pComp = new NAND(AND2_FANOUT);
@@ -418,6 +498,7 @@ void ApplicationManager::LoadAll(ifstream& LoadFile)
 		else if (GateType == "LED")
 		{
 			LED* pComp = new LED(AND2_FANOUT);
+
 			pComp->LoadComp(LoadFile);
 			AddComponent(pComp);
 		}
@@ -452,6 +533,7 @@ int ApplicationManager::GetUniqueId()
 {
 	return UniqueId++;
 }
+
 
 bool ApplicationManager::CheckCircuitValidation(int& InputPins, int& OutputPinsConn)
 {
@@ -516,6 +598,7 @@ void ApplicationManager::SetSelectedComp(Component* sComponent)
 	}
 }
 
+
 Component* ApplicationManager::GetSelectedComp(int& sIndex)
 {
 	sIndex = SelectedIndex;
@@ -524,7 +607,7 @@ Component* ApplicationManager::GetSelectedComp(int& sIndex)
 
 int ApplicationManager::ReturnIndex(Component* pComp)
 {
-	
+
 	for (int i = 0; i < CompCount; i++)
 	{
 		if (CompList[i] == pComp)
@@ -533,10 +616,12 @@ int ApplicationManager::ReturnIndex(Component* pComp)
 		}
 	}
 	return -1;
+
 }
 void ApplicationManager::RemoveSelectedIndex()
 {
 	SelectedIndex = -1;
+
 }
 
 void ApplicationManager::SimulateCircuitOutput()

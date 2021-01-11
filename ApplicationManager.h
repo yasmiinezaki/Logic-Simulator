@@ -24,10 +24,10 @@ private:
 	CompType CopiedComp; // Component type of copied component
 	int UniqueId;
 	int GatesCount; //Counts the number of gates in the compList
-
 	Component* SelectedComp;
 	int SelectedIndex;
 public:
+
 
 
 public:	
@@ -48,7 +48,9 @@ public:
 	//Adds a new component to the list of components
 	void AddComponent(Component* pComp);
 
+
 	//destructor
+
 	~ApplicationManager();
 
 	//////////////////////////////////////////////////////////////////// 
@@ -77,6 +79,7 @@ public:
 	void RemoveSelectedIndex();
 
 	void SimulateCircuitOutput();
+
 };
 
 #endif

@@ -1,15 +1,16 @@
 #pragma once
 #include "Actions/Action.h"
-#include "ApplicationManager.h"
+#include "XOR3.h"
 
-class Label : public Action
+class AddXorGate3 : public Action
 {
 private:
 	//Parameters for rectangular area to be occupied by the gate
 	int Cx, Cy;	//Center point of the gate
+	int x1, y1, x2, y2;	//Two corners of the rectangluar area
 public:
-	Label(ApplicationManager* pApp);
-	virtual ~Label(void);
+	AddXorGate3(ApplicationManager* pApp);
+	virtual ~AddXorGate3(void);
 
 	//Reads parameters required for action to execute
 	virtual void ReadActionParameters();
@@ -21,5 +22,4 @@ public:
 
 
 };
-
 
