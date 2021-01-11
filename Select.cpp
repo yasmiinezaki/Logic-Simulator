@@ -64,6 +64,7 @@ void Select::Execute()
 				CompSelected->setResult(false);
 				pManager->ExecuteAction(Change_Switch);
 			}
+
 		}
 	}
 }
