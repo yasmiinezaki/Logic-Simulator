@@ -1,15 +1,16 @@
 #pragma once
-#include "Actions/Action.h"
+#include"Actions/Action.h"
 #include "ApplicationManager.h"
 
-class Label : public Action
+class Move : public Action
 {
 private:
-	//Parameters for rectangular area to be occupied by the gate
-	int Cx, Cy;	//Center point of the gate
+	int FirstX, FirstY;
+	int x, y;
+
 public:
-	Label(ApplicationManager* pApp);
-	virtual ~Label(void);
+	Move(ApplicationManager* pApp);
+	~Move(void);
 
 	//Reads parameters required for action to execute
 	virtual void ReadActionParameters();
@@ -18,8 +19,5 @@ public:
 
 	virtual void Undo();
 	virtual void Redo();
-
-
 };
-
 

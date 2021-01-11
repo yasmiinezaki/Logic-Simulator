@@ -2,14 +2,13 @@
 #include "Actions/Action.h"
 #include "ApplicationManager.h"
 
-class Label : public Action
+class ADD_COMP : public Action
 {
 private:
-	//Parameters for rectangular area to be occupied by the gate
-	int Cx, Cy;	//Center point of the gate
+
 public:
-	Label(ApplicationManager* pApp);
-	virtual ~Label(void);
+	ADD_COMP(ApplicationManager* pApp);
+	~ADD_COMP(void);
 
 	//Reads parameters required for action to execute
 	virtual void ReadActionParameters();
@@ -18,8 +17,5 @@ public:
 
 	virtual void Undo();
 	virtual void Redo();
-
-
 };
-
 
