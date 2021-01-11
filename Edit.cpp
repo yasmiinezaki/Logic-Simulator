@@ -64,9 +64,16 @@ void Edit::EditInputPin()
 
 	Connection* ConnToEdit = (Connection*)CompToEdit;
 	pOutputPin = ConnToEdit->getSourcePin();
+	
+	int z, w;
+	Component* NotEditedComp = pOutputPin->getCompConnected();
+	Gate* NotEditedGate = (Gate*)NotEditedComp;
+	NotEditedGate->GetOutputPinCoordinates(z, w);
 
 	pOut->PrintMsg("Please click on the gate you want the connection to attach to.");
 	pIn->GetPointClicked(x, y);
+	pOut->ClearStatusBar();
+
 	int Index2 = -1;
 	CompType TypeToEditTo = NoComp;
 	Component* CompToEditTo = pManager->FindComp(x, y, Index2, TypeToEditTo);
@@ -74,58 +81,27 @@ void Edit::EditInputPin()
 	if (CompToEditTo && TypeToEditTo != Comp_WIRE)
 	{
 			Gate* GateToEditTo = (Gate*)CompToEditTo;
-			InputPin* InPin[3] = { NULL,NULL,NULL };
-			int noOfInputPins = GateToEditTo->get_m_Inputs();
-			for (int i = 0; i < noOfInputPins; i++)
+			int Ind = -1;
+			Ind=GateToEditTo->GetIndex();
+			InputPin* InPin = NULL;
+			if (Ind != -1)
 			{
-				InPin[i] = GateToEditTo->getDestPin(i);
-			}
+				InPin = GateToEditTo->getDestPin(Ind);
 
-			pOut->PrintMsg("Please enter the index of input pin.");
-			string PinChoice = pIn->GetSrting(pOut);
-			pOut->ClearStatusBar();
-
-			bool pinConnected;
-			int Choice;
-			if (PinChoice == "1")
-			{
-				Choice = 0;
-				pinConnected = InPin[Choice]->getIsConnected();
-				if (pinConnected==false)
-				{
-					ConnToEdit->setDestPin(InPin[Choice],Choice);
-					pManager->UpdateInterface();
-					pOut->DrawConnection()
-
-				}
+				GateToEditTo->GetInputPinCoordinates(x, y, Ind);
+				GraphicsInfo gInfo;
+				gInfo.x1 = z;
+				gInfo.y1 = w;
+				gInfo.x2 = x;
+				gInfo.y2 = y;
+				Component* comp = ConnToEdit->getDstCmpnt();
+				int mm = ConnToEdit->getIndexDstPin();
+				Gate* gate = (Gate*)comp;
+				gate->ResetDstPinValidity(mm);
+				ConnToEdit->setGrxInfo(gInfo);
+				ConnToEdit->setDestPin(InPin, Ind);
 			}
-			else if (PinChoice == "2" && (InPin[1]))
-			{
-				Choice = 1;
-				pinConnected = InPin[Choice]->getIsConnected();
-				if (pinConnected==false)
-				{
-					ConnToEdit->setDestPin(InPin[Choice], Choice);
-				}
-				else
-				{
-					pOut->PrintMsg("No connection at chosen input pin.");
-				}
-			}
-			if (PinChoice == "3" && (InPin[2]))
-			{
-				Choice = 2;
-				pinConnected = InPin[Choice]->getIsConnected();
-				if (pinConnected==false)
-				{
-					ConnToEdit->setDestPin(InPin[Choice], Choice);
-				}
-				else
-				{
-					pOut->PrintMsg("No connection at chosen input pin.");
-				}
-			}
-		}
+	}
 }
 
 
@@ -136,6 +112,13 @@ void Edit::EditOutputPin()
 	Input* pIn = pManager->GetInput();
 
 	Connection* ConnToEdit = (Connection*)CompToEdit;
+	pInputPin = ConnToEdit->getDestPin();
+
+	int t, s;
+	Component* CompNotEdited = pInputPin->getComponent();
+	Gate* GateNotEdited = (Gate*)CompNotEdited;
+	int count = GateNotEdited->GetIndex();
+	GateNotEdited->GetInputPinCoordinates(t, s,count);
 
 	pOut->PrintMsg("Please click on the new gate.");
 	pIn->GetPointClicked(x, y);
@@ -143,21 +126,29 @@ void Edit::EditOutputPin()
 
 	int Index1 = -1; // index of chosen gate in component list
 
-	CompType TypeToEdit;
+	CompType TypeToEdit= NoComp;
 	Component* nCompToEdit = pManager->FindComp(x, y, Index1, TypeToEdit);
 
-	if (Index1 != -1 && TypeToEdit != Comp_WIRE)
+	if (nCompToEdit && TypeToEdit != Comp_WIRE)
 	{
 		Gate* nGateToEdit = (Gate*)nCompToEdit;
 		OutputPin* OutPin=NULL;
 		nGateToEdit->getSourcePinPointer(OutPin);
+		nGateToEdit->GetOutputPinCoordinates(x, y);
+		GraphicsInfo GrInfo;
+		GrInfo.x1 = x;
+		GrInfo.y1 = y;
+		GrInfo.x2 = t;
+		GrInfo.y2 = s;
 
 		bool isFull = OutPin->IsFull();
 		if (isFull == false)
 		{
+			Component* comp = ConnToEdit->getSrcCmpnt();
+			Gate* gate = (Gate*)comp;
+			gate->ResetSrcPinValidity();
+			ConnToEdit->setGrxInfo(GrInfo);
 			ConnToEdit->setSourcePin(OutPin);
-			pManager->UpdateInterface();
-			ConnToEdit->Draw(pOut);
 		}
 	}
 	else
