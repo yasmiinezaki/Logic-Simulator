@@ -6,7 +6,6 @@
 #include "GUI\Input.h"
 #include "Actions\Action.h"
 #include "Components\Component.h"
-#include"Components/Gate.h"
 
 //Main class that manages everything in the application.
 class ApplicationManager
@@ -20,12 +19,17 @@ private:
 
 	Output* OutputInterface; //pointer to the Output Clase Interface
 	Input* InputInterface; //pointer to the Input Clase Interface
+
 	//////////////////////////////////////////////////////////////////// 
 	CompType CopiedComp; // Component type of copied component
 	int UniqueId;
 	int GatesCount; //Counts the number of gates in the compList
 	Component* SelectedComp;
 	int SelectedIndex;
+public:
+
+
+
 public:	
 	ApplicationManager(); //constructor
 
@@ -45,8 +49,8 @@ public:
 	void AddComponent(Component* pComp);
 
 
-	
-    //destructor
+	//destructor
+
 	~ApplicationManager();
 
 	//////////////////////////////////////////////////////////////////// 
@@ -67,13 +71,15 @@ public:
 
 	int GetUniqueId(); //generates a unique id for every component
 	bool CheckCircuitValidation(int& InputPins, int& OutputPinsConn);
-	//Simulate Circuit Operation 
-	void SimulateCircuitOutput();
+
 	void SetSelectedComp(Component* sComponent);
 	Component* GetSelectedComp(int& sIndex);
 
 	int ReturnIndex(Component*);
 	void RemoveSelectedIndex();
+
+	void SimulateCircuitOutput();
+
 };
 
 #endif
