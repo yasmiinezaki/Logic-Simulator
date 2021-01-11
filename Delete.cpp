@@ -5,6 +5,7 @@ Delete::Delete(ApplicationManager* pMang) : Action(pMang)
 {
 	x = 0;
 	y = 0;
+  
 	CompToDelete = NULL;
 	Index = -1;
 }
@@ -15,7 +16,9 @@ void Delete::ReadActionParameters()
 	//Get a Pointer to the Input / Output Interfaces
 	Output* pOut = pManager->GetOutput();
 	Input* pIn = pManager->GetInput();
-
+}
+void Delete::Execute()
+{
 	CompToDelete=pManager->GetSelectedComp(Index);
 }
 	
@@ -107,8 +110,10 @@ void Delete::Execute()
 			pManager->RemoveSelectedIndex();
 		}
 	}
+
 }
 void Delete::Undo()
 {}
 void Delete::Redo()
 {}
+

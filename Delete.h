@@ -9,11 +9,13 @@
 #include "Components/Connection.h"
 
 
+
 class Delete : public Action
 {
 	int x, y; // Clicked point
 	Component* CompToDelete;
 	int Index; //Index of selected Component
+
 public:
 	Delete(ApplicationManager* pMang);
 	virtual ~Delete(void);

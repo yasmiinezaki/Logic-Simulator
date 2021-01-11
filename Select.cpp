@@ -52,13 +52,19 @@ void Select::Execute()
 	}
 	if (TypeSelected == Comp_SWITCH)
 	{
-		if (CompSelected->getResult() == false)
+		if (!(UI.AppMode == DESIGN))
 		{
-			CompSelected->setResult(true);
-		}
-		else
-		{
-			CompSelected->setResult(false);
+			if (CompSelected->getResult() == false)
+			{
+				CompSelected->setResult(true);
+				pManager->ExecuteAction(Change_Switch);
+			}
+			else
+			{
+				CompSelected->setResult(false);
+				pManager->ExecuteAction(Change_Switch);
+			}
+
 		}
 	}
 }
