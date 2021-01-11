@@ -13,7 +13,8 @@
 #include "OutputPin.h"
 #include "Component.h"
 
-class Gate :public Component
+class Gate:public Component
+
 {
 protected:
 	InputPin* m_InputPins;	//Array of input pins of the Gate
@@ -23,6 +24,8 @@ protected:
 public:
 	Gate(int r_Inputs, int r_FanOut);
 
+  int GetId();
+	virtual int Getm_Conn() = 0;
 	virtual CompType GetCompType() = 0;
 
 	virtual void GetInputPinCoordinates(int& x, int& y, int index);
@@ -34,10 +37,15 @@ public:
 
 	virtual void ResetSrcPinValidity();
 	virtual void ResetDstPinValidity(int i);
+  bool Found(int x, int y);
 
 	virtual void getSourcePinPointer(OutputPin* & pOutPin );
 	virtual void getDestPinPointer(InputPin* & pInPin,int n);
 	virtual int get_m_Inputs();
+  virtual int GetInputPinsNum() = 0;
+
+	virtual bool NotAssignedInput();
+
 };
 
 #endif

@@ -4,10 +4,10 @@
 //Parameters:
 //r_Inputs: no. of gate's input pins
 //r_FanOut: Fan out of the gate's output pin
+
 Gate::Gate(int r_Inputs, int r_FanOut) :m_OutputPin(r_FanOut)
 {
-	Id = 0;
-
+  Id = 0;
 	//Allocate number of input pins (equals r_Inputs)
 	m_InputPins = new InputPin[r_Inputs];
 	m_Inputs = r_Inputs;	//set no. of inputs of that gate
@@ -24,7 +24,7 @@ void Gate::GetInputPinCoordinates(int& x, int& y, int index)
 	switch (m_Inputs)
 	{
 	case 1:
-		y = ((m_GfxInfo.y1 + m_GfxInfo.y2) / 2);
+		y = m_GfxInfo.y1 + ((m_GfxInfo.y2 - m_GfxInfo.y1) / 2);
 		break;
 	case 2:
 		y = m_GfxInfo.y1 + UI.PinOffSet + (UI.PinOffSet * index * 2);
@@ -41,7 +41,6 @@ void Gate::GetOutputPinCoordinates(int& x, int& y)
 {
 	x = m_GfxInfo.x2;
 	y = m_GfxInfo.y1 + (m_GfxInfo.y2 - m_GfxInfo.y1) / 2;
-
 }
 
 int Gate::GetIndex()
@@ -60,6 +59,7 @@ int Gate::GetIndex()
 }
 
 
+
 void Gate::ResetSrcPinValidity()
 {
 	OutputPin* pOutPin = &m_OutputPin;
@@ -71,18 +71,41 @@ void Gate::ResetDstPinValidity(int i)
 	m_InputPins[i].ResetIsConnected();
 }
 
-void Gate::getSourcePinPointer(OutputPin* & pOutPin)
+
+bool Gate::Found(int x, int y)
+{
+	if (x >= m_GfxInfo.x1 && x <= m_GfxInfo.x2 && y >= m_GfxInfo.y1 && y <= m_GfxInfo.y2) //see if it matches the coordinaates
+	{
+		return true;
+	}
+	return false;
+}
+
+void Gate::getSourcePinPointer(OutputPin*& pOutPin)
 {
 	if (&m_OutputPin)
 	{
 		pOutPin = &m_OutputPin;
 	}
 }
-void Gate::getDestPinPointer(InputPin* & pInPin,int n)
+void Gate::getDestPinPointer(InputPin*& pInPin, int n)
 {
-	pInPin= & m_InputPins[n];
+	pInPin = &m_InputPins[n];
 }
+
 int Gate::get_m_Inputs()
 {
 	return m_Inputs;
+}
+
+bool Gate::NotAssignedInput()
+{
+	for (int i = 0; i < m_Inputs; i++)
+	{
+		if (m_InputPins->getStatus() == STATUS::NotAssigned)
+		{
+			return true;
+		}
+	}
+	return false;
 }
